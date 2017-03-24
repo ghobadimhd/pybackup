@@ -9,7 +9,7 @@ def read_config(config_path):
 
 def make_archive(name, files):
     try:
-        tar = tarfile.open(name, 'w;bz2')
+        tar = tarfile.open(name, 'w:bz2')
         files = [files] if isinstance(files, list) else files
         for file in files:
             print(file)
