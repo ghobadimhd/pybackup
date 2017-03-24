@@ -52,12 +52,12 @@ def main():
             continue
         make_archive(dest, src)
 
-    for database, file in config.get('mysql', []):
-        mysqldump(config['user'], config['password'], database, file)
+    for database in config.get('databases', []):
+        mysqldump(config['mysql_user'], config['mysql_password'], database['name'], database['file'])
 
     if config.get('archive_all', False):
-        os.chdir(base_dir)
-        make_archive(backup_name,backup_name+'tar.bz2')
+        os.chdir(config['base_dir'])
+        make_archive(backup_name, backup_name)
 
 if __name__ == '__main__':
     main()
