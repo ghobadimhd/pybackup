@@ -21,8 +21,7 @@ def make_archive(name, files):
         print(e.strerror)
 
 def mysqldump(user, password, database, file):
-    cmd = 'mysqldump -u  {0} -P {1} {2} > {4}'.format(user, password, database, file)
-    #cmd = ['mysqldump' , '-u', user, '-p', password, database ]
+    cmd = 'mysqldump -u  {0} --password={1} {2} > {3}'.format(user, password, database, file+'.sql')
     status, stdout = sp.getstatusoutput(cmd)
     if status > 0:
         print("mysqldump error: " + stdout)
