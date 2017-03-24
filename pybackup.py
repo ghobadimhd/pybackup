@@ -14,7 +14,7 @@ def make_archive(name, files):
         tar = tarfile.open(name+'.tar.bz2', 'w:bz2')
         files = [files] if not isinstance(files, list) else files
         for file in files:
-            print(file)
+            print('archiving : '+file)
             tar.add(file)
         tar.close()
     except IOError as e:
@@ -32,7 +32,7 @@ def mysqldump(user, password, database, file):
 def main():
     config = read_config('/etc/pybackup.yaml')
     today = datetime.today()
-    date = '{0}-{1}-{2}'.format(today.year, today.month, today.day)
+    date = '{:%Y-%m-%d}'.format(today)
     backup_name = config.get('name', '') + '-' + date
     #check base_dir exitst if it's not make it
     if not os.path.exists(config['base_dir']):
@@ -40,13 +40,13 @@ def main():
 
     # change directory to base_dir
     os.chdir(config['base_dir'])
-    os.makedirs(backup_name)
+    if not os.path.exists(backup_name):
+        os.makedirs(backup_name)
     os.chdir(backup_name)
 
     for archive in config.get('archives', []):
         src = archive['src']
         dest = archive['dest']
-        #print(src)
         if not isinstance(dest, str):
             print('error: destination most be a path')
             continue
