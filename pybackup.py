@@ -60,5 +60,5 @@ def main():
         os.chdir(base_dir)
         make_archive(backup_name,backup_name+'tar.bz2')
 
-if __name__ == '__name__':
+if __name__ == '__main__':
     main()
