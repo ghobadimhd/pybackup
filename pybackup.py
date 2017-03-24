@@ -32,9 +32,9 @@ def mysqldump(user, password, database, file):
 
 def main():
     config = read_config('/etc/pybackup.yaml')
-    today = date.today()
+    today = datetime.today()
     date = '{0}-{1}-{2}'.format(today.year, today.month, today.day)
-    backup_name = config.get('name', '') + date
+    backup_name = config.get('name', '') + '-' + date
     #check base_dir exitst if it's not make it
     if not os.path.exists(config['base_dir']):
         os.makedirs(config['base_dir'])
