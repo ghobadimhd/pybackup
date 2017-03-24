@@ -1,7 +1,9 @@
-#!/usr/bin/pyt hon3
+#!/usr/bin/python3
+from datetime import datetime
 import tarfile
 import yaml
 import subprocess as sp
+import os
 def read_config(config_path):
     with open(config_path, 'r') as config_file:
         raw_config = config_file.read()
@@ -27,3 +29,35 @@ def mysqldump(user, password, database, file):
         return False
     else:
         return True
+
+def main():
+    config = read_config('/etc/pybackup.yaml')
+    today = date.today()
+    date = '{0}-{1}-{2}'.format(today.year, today.month, today.day)
+    backup_name = config.get('name', '') + date
+    #check base_dir exitst if it's not make it
+    if not os.path.exists(config['base_dir']):
+        os.makedirs(config['base_dir'])
+
+    # change directory to base_dir
+    os.chdir(config['base_dir'])
+    os.makedirs(backup_name)
+    os.chdir(backup_name)
+
+    for src, dest in config.get('archive', []):
+        if not isinstance(src, list):
+            src = [src]
+        if not isinstance(dest, str):
+            print('error: destination most be a path')
+            continue
+        make_archive(dset, src)
+
+    for database, file in config.get('mysql', []):
+        mysqldump(config['user'], config['password'], database, file)
+
+    if config.get('archive_all', False):
+        os.chdir(base_dir)
+        make_archive(backup_name,backup_name+'tar.bz2')
+
+if __name__ == '__name__':
+    main()
