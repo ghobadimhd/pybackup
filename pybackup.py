@@ -44,13 +44,14 @@ def main():
     os.makedirs(backup_name)
     os.chdir(backup_name)
 
-    for src, dest in config.get('archive', []):
-        if not isinstance(src, list):
-            src = [src]
+    for archive in config.get('archives', []):
+        src = archive['src']
+        dest = archive['dest']
+        #print(src)
         if not isinstance(dest, str):
             print('error: destination most be a path')
             continue
-        make_archive(dset, src)
+        make_archive(dest, src)
 
     for database, file in config.get('mysql', []):
         mysqldump(config['user'], config['password'], database, file)
