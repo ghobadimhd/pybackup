@@ -27,12 +27,12 @@ def read_config(config_path):
 
     return config
 
-def make_archive(name, files):
+def make_archive(name, files, compress_type='bz2'):
     try:
-        tar = tarfile.open(name+'.tar.bz2', 'w:bz2')
+        tar = tarfile.open(name+'.tar.' + compress_type, 'w:' + compress_type)
         files = [files] if not isinstance(files, list) else files
         for file in files:
-            print('archiving : '+file)
+            print('archiving : ' + file)
             tar.add(file)
         tar.close()
     except IOError as e:
@@ -79,7 +79,7 @@ def main():
         if not isinstance(dest, str):
             print('error: destination most be a path')
             continue
-        make_archive(dest, src)
+        make_archive(dest, src, config['compress_type'])
 
     for database in config.get('databases', []):
         mysqldump(config['mysql_user'], config['mysql_password'], database['name'], database['file'])
