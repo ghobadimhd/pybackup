@@ -16,7 +16,7 @@ def read_config(config_path):
     config['remove_raw_dir'] = config.get('remove_raw_dir', True)
     config['compress_type'] = config.get('compress_type', 'bz2')
     config['send_email'] = config.get('send_email', False)
-    config['base_dir'] = config.get('base_dir', os.path.abspath(os.curdir()))
+    config['base_dir'] = config.get('base_dir', os.path.abspath(os.curdir))
     config['rotate'] = config.get('rotate', 0)
     # check configuration parameter
     if 'datebases' in config and \
