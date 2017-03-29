@@ -48,20 +48,30 @@ def mysqldump(user, password, database, file):
     else:
         return True
 
+def change_dir(directory):
+    """chdir to directory if not exists to try to make it"""
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    if not os.path.isdir(directory):
+        return False
+    try:
+        os.chdir(directory)
+        return True
+    except Exception as e:
+        print(e.str)
+        return False
+
+
 def main():
     config = read_config('/etc/pybackup.yaml')
     today = datetime.today()
     date = '{:%Y-%m-%d}'.format(today)
     backup_name = config.get('name', '') + '-' + date
-    #check base_dir exitst if it's not make it
-    if not os.path.exists(config['base_dir']):
-        os.makedirs(config['base_dir'])
-
-    # change directory to base_dir
-    os.chdir(config['base_dir'])
-    if not os.path.exists(backup_name):
-        os.makedirs(backup_name)
-    os.chdir(backup_name)
+    # chdir to base_dir
+    if not change_dir(os.path.join(config['base_dir'],backup_name)):
+        print("error : failed to chdir ")
+        print('abort')
+        exit(1)
 
     for archive in config.get('archives', []):
         src = archive['src']
