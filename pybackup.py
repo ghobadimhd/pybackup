@@ -64,9 +64,12 @@ def change_dir(directory):
 
 def main():
     config = read_config('/etc/pybackup.yaml')
-    today = datetime.today()
-    date = '{:%Y-%m-%d}'.format(today)
-    backup_name = config.get('name', '') + '-' + date
+    if config['name_append_date']:
+        today = datetime.today()
+        date = ('{:'+config['date_format'] +'}').format(today)
+        backup_name = config['name'] + '-' + date
+    else:
+        backup_name = config['name']
     # chdir to base_dir
     if not change_dir(os.path.join(config['base_dir'],backup_name)):
         print("error : failed to chdir ")
