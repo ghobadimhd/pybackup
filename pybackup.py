@@ -4,6 +4,7 @@ import tarfile
 import yaml
 import subprocess as sp
 import os
+import shutil
 def read_config(config_path):
     with open(config_path, 'r') as config_file:
         raw_config = config_file.read()
@@ -61,17 +62,6 @@ def change_dir(directory):
         print(e.str)
         return False
 
-def remove_dir(directory):
-    """recursivly remove directory and files"""
-    for file in os.listdir(directory):
-        file_path = os.path.join(directory,file)
-        if os.path.isdir(file_path):
-            remove_dir(file_path)
-        else:
-            os.remove(file_path)
-    os.removedirs(directory)
-
-
 def main():
     config = read_config('/etc/pybackup.yaml')
     if config['name_append_date']:
@@ -102,7 +92,7 @@ def main():
         make_archive(backup_name, backup_name)
 
     if config['remove_raw_dir']:
-        print('removing :' + backup_name)
-        remove_dir(backup_name)
+        print('removing : ' + backup_name)
+        shutil.rmtree(os.path.join(config['base_dir'],backup_name))
 if __name__ == '__main__':
     main()
