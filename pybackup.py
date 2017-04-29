@@ -25,6 +25,7 @@ def read_config(config_path):
     if 'databases' in config:
         config['mysql_user'] = config.get('mysql_user', getpass.getuser())
         config['mysql_password'] = config.get('mysql_password', None)
+        config['mysql_password'] = str(config['mysql_password'])
 
     return config
 
