@@ -64,7 +64,7 @@ def change_dir(directory):
         os.chdir(directory)
         return True
     except Exception as e:
-        print(e.str)
+        print('change_dir error : ' + e.str)
         return False
 
 def main():
