@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import sys
 from datetime import datetime
 import tarfile
 import yaml
@@ -6,6 +7,8 @@ import subprocess as sp
 import os
 import shutil
 import getpass
+
+DEFAULT_CONFIG_FILE = '/etc/pybackup.yaml'
 
 def read_config(config_path):
     with open(config_path, 'r') as config_file:
@@ -69,7 +72,15 @@ def change_dir(directory):
         return False
 
 def main():
-    config = read_config('/etc/pybackup.yaml')
+    # load config file 
+    if len(sys.argv) > 2 and sys.argv[1] =='-c':
+        config_file = sys.argv[2]
+    else:
+        print('using default config path : ' + DEFAULT_CONFIG_FILE)
+        config_file = DEFAULT_CONFIG_FILE
+    
+    # parse config file
+    config = read_config(config_file)
     if config['name_append_date']:
         today = datetime.today()
         date = ('{:'+config['date_format'] +'}').format(today)
