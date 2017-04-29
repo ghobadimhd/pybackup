@@ -41,15 +41,15 @@ def make_archive(name, files, compress_type='bz2'):
         print('archive error : '+ e.strerror + '\n\tfilename :' + e.filename)
 
 def mysqldump(database, file, user, password=None):
-    if password is None:
-        cmd = 'mysqldump -u  {0} {2} -r {3}'.format(user, password, database, file + '.sql')
-    else:
-        cmd = 'mysqldump -u  {0} --password={1} {2} -r {3}'.format(user, password, database, file + '.sql')
 
+    cmd = ['mysqldump', database, '-u', user, '-r', file + '.sql']
+    if password is not None:
+        cmd.append('--password='+password)
     print('dumping database : ' + database)
-    status, stdout = sp.getstatusoutput(cmd)
-    if status > 0:
-        print("mysqldump error: " + stdout)
+
+    process = sp.run(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
+    if process.returncode > 0:
+        print("mysqldump error: " + process.stderr)
         return False
     else:
         return True
