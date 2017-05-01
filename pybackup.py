@@ -100,7 +100,7 @@ def main():
 
     if config.get('archive_all', False):
         os.chdir(config['base_dir'])
-        make_archive(backup_name, backup_name)
+        make_archive(backup_name, backup_name, config['compress_type'])
 
     if config['remove_raw_dir']:
         print('removing : ' + backup_name + ' raw directory ...')
