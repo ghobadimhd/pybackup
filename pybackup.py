@@ -7,6 +7,7 @@ import subprocess as sp
 import os
 import shutil
 import getpass
+import archive
 
 DEFAULT_CONFIG_FILE = '/etc/pybackup.yaml'
 
@@ -24,6 +25,7 @@ def read_config(config_path):
     config['send_email'] = config.get('send_email', False)
     config['base_dir'] = config.get('base_dir', os.path.abspath(os.curdir))
     config['rotate'] = config.get('rotate', 0)
+    config['archive_engine'] = config.get('archive_engine', 'tar')
     # check configuration parameter
     if 'databases' in config:
         config['mysql_user'] = config.get('mysql_user', getpass.getuser())
@@ -32,17 +34,9 @@ def read_config(config_path):
 
     return config
 
-def make_archive(name, files, compress_type='bz2'):
-    try:
-        tar = tarfile.open(name+'.tar.' + compress_type, 'w:' + compress_type)
-        files = [files] if not isinstance(files, list) else files
-        for file in files:
-            print('archiving : ' + file)
-            tar.add(file)
-            print(file)
-        tar.close()
-    except IOError as e:
-        print('archive error : '+ e.strerror + '\n\tfilename :' + e.filename)
+def make_archive(name, files, compress_type='bz2', remove_old=False, engine='tar'):
+    engines = {'tar':archive.tar_create, 'tarfile':archive.tarfile_create}
+    engines[engine](name, files, compress_type, remove_old)
 
 def mysqldump(database, file, user, password=None):
 
@@ -99,7 +93,7 @@ def main():
         if not isinstance(dest, str):
             print('error: destination most be a path')
             continue
-        make_archive(dest, src, config['compress_type'])
+        make_archive(dest, src, config['compress_type'], engine=config['archive_engine'])
 
     for database in config.get('databases', []):
         mysqldump(database['name'], database['file'], config['mysql_user'], config['mysql_password'])
@@ -109,7 +103,7 @@ def main():
         make_archive(backup_name, backup_name)
 
     if config['remove_raw_dir']:
-        print('removing : ' + backup_name)
+        print('removing : ' + backup_name + ' raw directory ...')
         shutil.rmtree(os.path.join(config['base_dir'],backup_name))
 if __name__ == '__main__':
     main()

@@ -46,7 +46,7 @@ def tar_create(name, files, compress_type='bz2', remove_old=False):
     if process.returncode == 0:
         return True
     else:
-        print(process.stderr)
+        print(process.stderr.decode())
         return False
 
 def tarfile_create(name, files, compress_type='bz2', remove_old=False):
@@ -81,5 +81,6 @@ def tarfile_create(name, files, compress_type='bz2', remove_old=False):
             tar.add(file)
             print(file)
         tar.close()
+        return True
     except IOError as e:
         print('archive error : '+ e.strerror + '\n\tfilename :' + e.filename)
