@@ -11,6 +11,7 @@ import archive
 
 DEFAULT_CONFIG_FILE = '/etc/pybackup.yaml'
 
+
 def read_config(config_path):
     with open(config_path, 'r') as config_file:
         raw_config = config_file.read()
@@ -34,15 +35,18 @@ def read_config(config_path):
 
     return config
 
-def make_archive(name, files, compress_type='bz2', remove_old=False, engine='tar'):
-    engines = {'tar':archive.tar_create, 'tarfile':archive.tarfile_create}
+
+def make_archive(name, files, compress_type='bz2',
+                 remove_old=False, engine='tar'):
+    engines = {'tar': archive.tar_create, 'tarfile': archive.tarfile_create}
     engines[engine](name, files, compress_type, remove_old)
+
 
 def mysqldump(database, file, user, password=None):
 
     cmd = ['mysqldump', database, '-u', user, '-r', file + '.sql']
     if password is not None:
-        cmd.append('--password='+password)
+        cmd.append('--password=' + password)
     print('dumping database : ' + database)
 
     process = sp.run(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
@@ -51,6 +55,7 @@ def mysqldump(database, file, user, password=None):
         return False
     else:
         return True
+
 
 def change_dir(directory):
     """chdir to directory if not exists to try to make it"""
@@ -65,24 +70,26 @@ def change_dir(directory):
         print('change_dir error : ' + e.str)
         return False
 
+
 def main():
-    # load config file 
-    if len(sys.argv) > 2 and sys.argv[1] =='-c':
+    # load config file
+    if len(sys.argv) > 2 and sys.argv[1] == '-c':
         config_file = sys.argv[2]
     else:
         print('using default config path : ' + DEFAULT_CONFIG_FILE)
         config_file = DEFAULT_CONFIG_FILE
-    
+
     # parse config file
     config = read_config(config_file)
     if config['name_append_date']:
         today = datetime.today()
-        date = ('{:'+config['date_format'] +'}').format(today)
+        # FIXME: too unclear(make it readable)
+        date = ('{:'+config['date_format'] + '}').format(today)
         backup_name = config['name'] + '-' + date
     else:
         backup_name = config['name']
     # chdir to base_dir
-    if not change_dir(os.path.join(config['base_dir'],backup_name)):
+    if not change_dir(os.path.join(config['base_dir'], backup_name)):
         print("error : failed to chdir ")
         print('abort')
         exit(1)
@@ -93,10 +100,12 @@ def main():
         if not isinstance(dest, str):
             print('error: destination most be a path')
             continue
-        make_archive(dest, src, config['compress_type'], engine=config['archive_engine'])
+        make_archive(dest, src, config[
+                     'compress_type'], engine=config['archive_engine'])
 
     for database in config.get('databases', []):
-        mysqldump(database['name'], database['file'], config['mysql_user'], config['mysql_password'])
+        mysqldump(database['name'], database['file'], config[
+                  'mysql_user'], config['mysql_password'])
 
     if config.get('archive_all', False):
         os.chdir(config['base_dir'])
@@ -104,6 +113,8 @@ def main():
 
     if config['remove_raw_dir']:
         print('removing : ' + backup_name + ' raw directory ...')
-        shutil.rmtree(os.path.join(config['base_dir'],backup_name))
+        shutil.rmtree(os.path.join(config['base_dir'], backup_name))
+
+
 if __name__ == '__main__':
     main()
