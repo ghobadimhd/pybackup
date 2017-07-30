@@ -5,6 +5,7 @@ import tarfile
 import yaml
 import subprocess as sp
 import os
+import argparse
 import shutil
 import getpass
 import archive
@@ -71,16 +72,18 @@ def change_dir(directory):
         return False
 
 
+def argparser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--config', default=DEFAULT_CONFIG_FILE)
+    return parser.parse_args()
+
+
 def main():
     # load config file
-    if len(sys.argv) > 2 and sys.argv[1] == '-c':
-        config_file = sys.argv[2]
-    else:
-        print('using default config path : ' + DEFAULT_CONFIG_FILE)
-        config_file = DEFAULT_CONFIG_FILE
+    options = argparser()
 
     # parse config file
-    config = read_config(config_file)
+    config = read_config(options.config)
     if config['name_append_date']:
         today = datetime.today()
         # FIXME: too unclear(make it readable)
