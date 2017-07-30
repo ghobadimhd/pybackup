@@ -110,7 +110,7 @@ def main():
         mysqldump(database['name'], database['file'], config[
                   'mysql_user'], config['mysql_password'])
 
-    if config.get('archive_all', False):
+    if config.get('archive_all'):
         os.chdir(config['base_dir'])
         make_archive(backup_name, backup_name, config['compress_type'])
 
